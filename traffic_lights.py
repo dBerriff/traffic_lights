@@ -1,4 +1,4 @@
-#MicroPython
+#MicroPython on RPi Pico
 from machine import Pin
 from time import sleep, time
 import random
