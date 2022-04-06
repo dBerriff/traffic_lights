@@ -51,8 +51,9 @@ class TrafficLight:
     Pause_A = 3.0 # s
     Pause_switch = 0.2 # s
     
-    def __init__(self, pins):
-        self.hardware = TlLeds(GpioPins(pins).led_pins)
+    def __init__(self, red, amber, green):
+        self.hardware = TlLeds(
+            GpioPins((red, amber, green)).led_pins)
         self.index = TrafficLight.Index
         TrafficLight.Index += 1
         self.lights = self.hardware.set_lights('R')
@@ -94,11 +95,9 @@ def main():
     
     print('Initialising:', end='')
 
-    t_lts = (
-             TrafficLight((2, 1, 0)),
-             TrafficLight((5, 4, 3)),
-             TrafficLight((8, 7, 6))
-            )
+    t_lts = (TrafficLight(2, 1, 0),
+             TrafficLight(5, 4, 3),
+             TrafficLight(8, 7, 6))
     
     n_ways = len(t_lts)
     print(f' {n_ways}-way traffic lights')

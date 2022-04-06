@@ -68,8 +68,8 @@ class TrafficLight:
     Pause_RA = 2.0
     Pause_A = 3.0
     
-    def __init__(self, pins):
-        self.hardware = TlLeds(TlPins(pins).led_pins)
+    def __init__(self, red, amber, green):
+        self.hardware = TlLeds(TlPins((red, amber, green)).led_pins)
         self.index = TrafficLight.Index
         TrafficLight.Index += 1
         self.lights = self.hardware.set_lights('R')
@@ -109,8 +109,8 @@ def main():
     # TrafficLight[0] is set to Go to start the sequence
     print('Initialising...')
     tls = (
-           TrafficLight((2, 1, 0)),
-           TrafficLight((6, 5, 4))
+           TrafficLight(2, 1, 0),
+           TrafficLight(6, 5, 4)
           )
     n_ways = len(tls)
     # select first green light

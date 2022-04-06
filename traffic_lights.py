@@ -77,8 +77,9 @@ class CrossingLight:
     """simulates simple red/green crossing lights
        - common to all traffic lights"""
     
-    def __init__(self, pins):
-        self.hardware = XLeds(GpioPins(pins).led_pins)
+    def __init__(self, red, green):
+        self.hardware = XLeds(
+            GpioPins((red, green)).led_pins)
         self.lights = self.hardware.set_lights('W')
     
     def __str__(self):
@@ -127,8 +128,9 @@ class TrafficLight:
     Pause_RA = 2.5
     Pause_A = 3.0
     
-    def __init__(self, pins):
-        self.hardware = TlLeds(GpioPins(pins).led_pins)
+    def __init__(self, red, amber, green):
+        self.hardware = TlLeds(
+            GpioPins((red, amber, green)).led_pins)
         self.index = TrafficLight.Index
         TrafficLight.Index += 1
         self.lights = self.hardware.set_lights('R')
@@ -175,15 +177,16 @@ def main():
     # then loop indefinitely
     
     print('Initialising:', end='')
-
+    # (red, amber, green)
     t_lts = (
-             TrafficLight((2, 1, 0)),
-             TrafficLight((5, 4, 3)),
-             TrafficLight((8, 7, 6))             
+             TrafficLight(2, 1, 0),
+             TrafficLight(5, 4, 3),
+             TrafficLight(8, 7, 6)             
             )
     n_ways = len(t_lts)
     
-    x_lts = CrossingLight((15, 14))
+    # (red, green)
+    x_lts = CrossingLight(15, 14)
     #crossing button: GPIO pin
     button = HardwareIn(20)
     # select first green light
@@ -191,7 +194,7 @@ def main():
     
     # set control flags
     can_set_green = False
-    set_crossing = False
+    req_crossing = False
     
     print(f' {n_ways}-way traffic & single crossing lights')    
     # start the sequence
@@ -206,18 +209,18 @@ def main():
             can_set_green = True
         
         if button.check_button():
-            set_crossing = True
+            req_crossing = True
         
-        if set_crossing:
+        if req_crossing:
             # crossing requested
             if can_set_green:
                 # all lights Red so cross...
                 x_lts.set_cross()
                 x_lts.set_flashing() #flash green
                 x_lts.set_wait()
-                set_crossing = False
+                req_crossing = False
             else:
-                # for testing, overwrite on loop
+                # overwrite on loop
                 print('WAIT', end='\r')
             
         if can_set_green:
