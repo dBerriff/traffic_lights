@@ -1,4 +1,3 @@
-#MicroPython on RPi Pico
 from machine import Pin
 from time import sleep, time
 from random import randint
@@ -52,11 +51,11 @@ class TrafficLight:
     Pause_A = 3.0 # s
     Pause_switch = 0.2 # s
     
-    def __init__(self, hardware):
-        self.hardware = hardware
+    def __init__(self, pins):
+        self.hardware = TlLeds(GpioPins(pins).led_pins)
         self.index = TrafficLight.Index
         TrafficLight.Index += 1
-        self.lights = hardware.set_lights('R')
+        self.lights = self.hardware.set_lights('R')
         self.green_hold = 0
     
     def __str__(self):
@@ -96,9 +95,9 @@ def main():
     print('Initialising:', end='')
 
     t_lts = (
-             TrafficLight(TlLeds(GpioPins((2, 1, 0)).led_pins)),
-             TrafficLight(TlLeds(GpioPins((5, 4, 3)).led_pins)),
-             TrafficLight(TlLeds(GpioPins((8, 7, 6)).led_pins))
+             TrafficLight((2, 1, 0)),
+             TrafficLight((5, 4, 3)),
+             TrafficLight((8, 7, 6))
             )
     
     n_ways = len(t_lts)

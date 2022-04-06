@@ -77,9 +77,9 @@ class CrossingLight:
     """simulates simple red/green crossing lights
        - common to all traffic lights"""
     
-    def __init__(self, hardware):
-        self.hardware = hardware
-        self.lights = hardware.set_lights('W')
+    def __init__(self, pins):
+        self.hardware = XLeds(GpioPins(pins).led_pins)
+        self.lights = self.hardware.set_lights('W')
     
     def __str__(self):
         """for print()"""
@@ -107,7 +107,7 @@ class CrossingLight:
     def set_wait(self):
         """set red Wait light"""
         self.lights = self.hardware.set_lights('W')
-        print(f'Wait  : {self}') #===
+        print(f'Crossing Wait: {self}') #===
                 
         
 class TrafficLight:
@@ -127,12 +127,11 @@ class TrafficLight:
     Pause_RA = 2.5
     Pause_A = 3.0
     
-    def __init__(self, hardware):
-        self.hardware = hardware
+    def __init__(self, pins):
+        self.hardware = TlLeds(GpioPins(pins).led_pins)
         self.index = TrafficLight.Index
         TrafficLight.Index += 1
-        # initialise to Red
-        self.lights = hardware.set_lights('R')
+        self.lights = self.hardware.set_lights('R')
         self.green_hold = 0
         self.flashing = False
     
@@ -177,22 +176,24 @@ def main():
     
     print('Initialising:', end='')
 
-    t_lts = (TrafficLight(TlLeds(GpioPins((2, 1, 0)).led_pins)),
-             TrafficLight(TlLeds(GpioPins((5, 4, 3)).led_pins)),
-             TrafficLight(TlLeds(GpioPins((8, 7, 6)).led_pins))
+    t_lts = (
+             TrafficLight((2, 1, 0)),
+             TrafficLight((5, 4, 3)),
+             TrafficLight((8, 7, 6))             
             )
     n_ways = len(t_lts)
-    x_lts = CrossingLight(XLeds(GpioPins((15, 14)).led_pins))
-    print(f' {n_ways}-way traffic & single crossing lights')
-    # select first green light
-    tl_green = t_lts[0]
+    
+    x_lts = CrossingLight((15, 14))
     #crossing button: GPIO pin
     button = HardwareIn(20)
+    # select first green light
+    tl_green = t_lts[0]
     
     # set control flags
     can_set_green = False
     set_crossing = False
     
+    print(f' {n_ways}-way traffic & single crossing lights')    
     # start the sequence
     x_lts.set_wait()
     tl_green.set_go()
