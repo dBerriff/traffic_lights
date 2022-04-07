@@ -6,7 +6,8 @@ import random
 """Simulates UK traffic light sequence on LEDs
    Tested on:
    - MicroPython running on Cytron Maker Pi Pico board
-   - note: on-board button is hard-wired with pull-up resistor"""
+   - note: on-board button is hard-wired with pull-up resistor
+   - polls for button-press"""
 
 
 class HardwareIn:
