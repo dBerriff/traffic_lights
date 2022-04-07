@@ -3,26 +3,27 @@ from machine import Pin
 from time import sleep, time
 import random
 
-"""Simulates UK traffic light sequence on LEDs
+"""
+   Simulates UK traffic light sequence on LEDs
    Tested on:
    - MicroPython running on Cytron Maker Pi Pico board
-   - note: on-board button is hard-wired with pull-up resistor"""
-
+   - note: on-board button 20 is hard-wired with pull-up resistor
+"""
 
 class HardwareIn:
     """for button press - crossing request"""
     
     def __init__(self, b_pin):
         """set button pin as input"""
-        self.button = machine.Pin(b_pin, Pin.IN, Pin.PULL_UP)
+        self.button = Pin(b_pin, Pin.IN, Pin.PULL_DOWN)
+        self.button.irq(trigger=Pin.IRQ_FALLING,
+                        handler=self.irq_handler)
+        self.req_crossing = False
+
+    def irq_handler(self, pin):
+        self.req_crossing = True
+
     
-    def check_button(self) -> bool:
-        """check for button-press
-           Cytron RP2040 on-board button:
-           returns:normally 1; 0 while press"""
-        return self.button.value() == 0
-
-
 class GpioPins:
     """given GPIO pins, set logical LED pins for output"""
     
@@ -56,29 +57,12 @@ class Leds:
         return pin_state
 
 
-class XLeds(Leds):
-    """red and green crossing lights
-       Wait: red; Cross: green; None: for blink"""
-    
-    def __init__(self, led_pins):
-        # super() is the Leds class
-        super().__init__(led_pins)
-    
-
-class TlLeds(Leds):
-    """red, amber and green traffic lights"""
-    
-    def __init__(self, led_pins):
-        # super() is the Leds class
-        super().__init__(led_pins)
-    
-
 class CrossingLight:
     """simulates simple red/green crossing lights
        - common to all traffic lights"""
     
     def __init__(self, red, green):
-        self.hardware = XLeds(
+        self.hardware = Leds(
             GpioPins((red, green)).led_pins)
         self.lights = self.hardware.set_lights('W')
     
@@ -129,7 +113,7 @@ class TrafficLight:
     Pause_A = 3.0
     
     def __init__(self, red, amber, green):
-        self.hardware = TlLeds(
+        self.hardware = Leds(
             GpioPins((red, amber, green)).led_pins)
         self.index = TrafficLight.Index
         TrafficLight.Index += 1
@@ -187,16 +171,15 @@ def main():
     
     # (red, green)
     x_lts = CrossingLight(15, 14)
-    #crossing button: GPIO pin
-    button = HardwareIn(20)
     # select first green light
     tl_green = t_lts[0]
+    button_20 = HardwareIn(20)
     
     # set control flags
     can_set_green = False
-    req_crossing = False
     
     print(f' {n_ways}-way traffic & single crossing lights')    
+
     # start the sequence
     x_lts.set_wait()
     tl_green.set_go()
@@ -208,17 +191,14 @@ def main():
             # set flag: next-green pending and allow-crossing
             can_set_green = True
         
-        if button.check_button():
-            req_crossing = True
-        
-        if req_crossing:
+        if button_20.req_crossing:
             # crossing requested
             if can_set_green:
                 # all lights Red so cross...
                 x_lts.set_cross()
                 x_lts.set_flashing() #flash green
                 x_lts.set_wait()
-                req_crossing = False
+                button_20.req_crossing = False
             else:
                 # overwrite on loop
                 print('WAIT', end='\r')
@@ -230,7 +210,6 @@ def main():
             can_set_green = False
             
         # do something else...
-        # check for crossing button on each loop
         sleep(0.1)
 
 if __name__ == '__main__':
