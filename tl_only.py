@@ -44,8 +44,8 @@ class TrafficLight:
 
     # Index tracks object set to green
     Index = 0
-    Change_seq = {'GO': ('RA', 'G'),
-                  'ST': ('A', 'R')}
+    Change_seq = {'Go_seq': ('RA', 'G'),
+                  'Stop_seq': ('A', 'R')}
     # 
     Pause_RA = 2.5 # s
     Pause_A = 3.0 # s
@@ -77,13 +77,13 @@ class TrafficLight:
     
     def set_go(self):
         """set to Go and store end time"""
-        self.set_state('GO')
+        self.set_state('Go_seq')
         # set hold time ~ 10s
         self.green_hold = time() + randint(8, 12) # s
     
     def set_stop(self):
         """set to Stop"""
-        self.set_state('ST')
+        self.set_state('Stop_seq')
         
     def hold_is_over(self):
         return time() > self.green_hold

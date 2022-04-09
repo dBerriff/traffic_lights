@@ -15,7 +15,7 @@ class HardwareIn:
     
     def __init__(self, b_pin):
         """set button pin as input"""
-        self.button = Pin(b_pin, Pin.IN, Pin.PULL_DOWN)
+        self.button = Pin(b_pin, Pin.IN)
         self.button.irq(trigger=Pin.IRQ_FALLING,
                         handler=self.irq_handler)
         self.req_crossing = False

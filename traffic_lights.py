@@ -15,7 +15,7 @@ class HardwareIn:
     
     def __init__(self, b_pin):
         """set button pin as input"""
-        self.button = machine.Pin(b_pin, Pin.IN, Pin.PULL_UP)
+        self.button = machine.Pin(b_pin, Pin.IN)
     
     def check_button(self) -> bool:
         """check for button-press
@@ -189,7 +189,7 @@ def main():
     # (red, green)
     x_lts = CrossingLight(15, 14)
     #crossing button: GPIO pin
-    button = HardwareIn(20)
+    button_20 = HardwareIn(20)
     # select first green light
     tl_green = t_lts[0]
     
@@ -209,7 +209,7 @@ def main():
             # set flag: next-green pending and allow-crossing
             can_set_green = True
         
-        if button.check_button():
+        if button_20.check_button():
             req_crossing = True
         
         if req_crossing:
