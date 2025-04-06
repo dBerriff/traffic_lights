@@ -5,3 +5,4 @@ Code is intended to show use of Python data structures and classes.
 Scalable by adding more traffic lights.
 Crossing is simplistic - one crossing setting for all traffic lights.
 _int version adds interrupt handler to react to button-press
+Would now develop as async code.
